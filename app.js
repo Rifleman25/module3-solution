@@ -10,8 +10,10 @@
 
     function FoundItem() {
         var ddo = {
-            restrict: "E",
-            templateUrl: 'foundItem.html'
+            template: '<li>' +
+                '<found-item-description></found-item-description>' +
+                '<button ng-click="search.onRemoveMenuItem($index);">Don' + 't want this one!</button>' +
+            '</li>'
           };
         
           return ddo;
@@ -19,7 +21,7 @@
 
     function FoundItemDescription() {
         var ddo = {
-          template: '{{ item.name }}'
+          template: ' ({{ item.short_name }}) - {{ item.name }}, {{ item.description }}'
         };
       
         return ddo;
@@ -28,16 +30,29 @@
     MenuSearchController.$inject = ['MenuSearchService'];
     function MenuSearchController (MenuSearchService) {
         var menu = this;
+
+        menu.found = true;
+
+        menu.foundItems = MenuSearchService.getFoundItems();
+
         this.onSearch = function () {
+
+            if (menu.serachText == undefined || menu.serachText == '') {
+                menu.found = false;
+                return;
+            }
+
             var promise = MenuSearchService.onSearch();
 
             promise.then(function (response) {
-                menu.foundItems = response.data.menu_items;
-                menu.foundItems.splice(50, 200);
-                console.log(response.data.menu_items);
+                menu.foundItems = MenuSearchService.onFilter(response.data.menu_items, menu.serachText);
+
+                if (menu.foundItems.length == 0)
+                    menu.found = false;
+                else menu.found = true;
             })
-            .catch(function (error) {
-                console.log("Something went terribly wrong.");
+            .catch( function (error) {
+                menu.found = false;
             });
         }
 
@@ -50,7 +65,7 @@
     function MenuSearchService ($http, ApiBasePath) {
         var foundItems = [];
 
-        this.onSearch = function (searchText) {
+        this.onSearch = function () {
             var response = $http({
                 method: "GET",
                 url: ApiBasePath
@@ -59,8 +74,28 @@
             return response;
         }
 
+        this.onFilter = function (menu, searchText) {
+            foundItems = [];
+            for (var i = 0; i < menu.length; i ++) {
+                if (menu[i].description && menu[i].description.toLowerCase().search(searchText.toLowerCase()) !== - 1) {
+                    foundItems.push(result[i]);
+                }
+                else if (menu[i].name && menu[i].name.toLowerCase().search(searchText.toLowerCase()) !== - 1) {
+                    foundItems.push(result[i]);
+                }
+                else if (menu[i].short_name && menu[i].short_name.toLowerCase().search(searchText.toLowerCase()) !== - 1) {
+                    foundItems.push(result[i]);
+                }
+            }
+            return foundItems;
+        }
+
         this.onRemoveMenuItem = function (index) {
             foundItems.splice(index, 1);
+        }
+
+        this.getFoundItems = function () {
+            return foundItems;
         }
     }
 }) ();

@@ -13,14 +13,17 @@
     <h1>Narrow Down Your Chinese Menu Choice</h1>
 
     <div class="form-group">
-      <input type="text" placeholder="search term" class="form-control" ng-model="serachText">
+      <input type="text" placeholder="search term" class="form-control" ng-model="search.serachText">
     </div>
     <div class="form-group narrow-button" ng-click="search.onSearch()">
       <button class="btn btn-primary">Narrow It Down For Me!</button>
-    </div>
+    </div> 
 
-    <!-- found-items should be implemented as a component -->
-    <div>
+    <br><br><br>
+
+    <h1 ng-if="!search.found">Nothing found</h1>
+
+    <div class="form-group">
       <ol>
         <found-item ng-repeat="item in search.foundItems"></found-item>
       </ol>
