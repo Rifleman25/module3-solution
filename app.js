@@ -39,6 +39,7 @@
 
             if (menu.serachText == undefined || menu.serachText == '') {
                 menu.found = false;
+                menu.foundItems = [];
                 return;
             }
 
