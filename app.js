@@ -58,6 +58,8 @@
 
         this.onRemoveMenuItem = function (index) {
             MenuSearchService.onRemoveMenuItem(index);
+            if (MenuSearchService.getFoundItems().length == 0)
+                menu.found = false;
         }
     }
 
@@ -78,13 +80,13 @@
             foundItems = [];
             for (var i = 0; i < menu.length; i ++) {
                 if (menu[i].description && menu[i].description.toLowerCase().search(searchText.toLowerCase()) !== - 1) {
-                    foundItems.push(result[i]);
+                    foundItems.push(menu[i]);
                 }
                 else if (menu[i].name && menu[i].name.toLowerCase().search(searchText.toLowerCase()) !== - 1) {
-                    foundItems.push(result[i]);
+                    foundItems.push(menu[i]);
                 }
                 else if (menu[i].short_name && menu[i].short_name.toLowerCase().search(searchText.toLowerCase()) !== - 1) {
-                    foundItems.push(result[i]);
+                    foundItems.push(menu[i]);
                 }
             }
             return foundItems;
